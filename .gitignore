@@ -1,3 +1,5 @@
 .terraform*
 *.zip
 terraform.tfstate*
+infra/python-bot-layer/*
+infra/.tfvars
