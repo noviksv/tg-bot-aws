@@ -13,3 +13,8 @@ Apply terraform infra
 ```
 terraform apply -var-file=".tfvars"
 ```
+Trigger lambda from local environment
+
+```
+ aws lambda invoke --function-name weather_bot outfile.txt
+```

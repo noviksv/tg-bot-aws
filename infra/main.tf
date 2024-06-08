@@ -24,8 +24,8 @@ data "archive_file" "lambda_zip" {
   output_path = "lambda_function_payload.zip"
 }
 
-resource "aws_lambda_function" "example" {
-  function_name = "example_lambda"
+resource "aws_lambda_function" "weather_bot_lambda" {
+  function_name = "weather_bot"
 
   filename      = data.archive_file.lambda_zip.output_path
   source_code_hash = data.archive_file.lambda_zip.output_base64sha256
@@ -42,11 +42,11 @@ resource "aws_lambda_function" "example" {
     }
   }
 
-  role = aws_iam_role.example.arn
+  role = aws_iam_role.weather_bot_lambda.arn
 }
 
-resource "aws_iam_role" "example" {
-  name = "example_role"
+resource "aws_iam_role" "weather_bot_lambda" {
+  name = "weather_bot_lambda_role"
 
   assume_role_policy = <<EOF
 {
@@ -74,13 +74,13 @@ resource "aws_cloudwatch_event_rule" "every_day_at_5_am_utc" {
 resource "aws_cloudwatch_event_target" "send_weather_update" {
   rule      = aws_cloudwatch_event_rule.every_day_at_5_am_utc.name
   target_id = "sendWeatherUpdate"
-  arn       = aws_lambda_function.example.arn
+  arn       = aws_lambda_function.weather_bot_lambda.arn
 }
 
 resource "aws_lambda_permission" "allow_cloudwatch" {
   statement_id  = "AllowExecutionFromCloudWatch"
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.example.function_name
+  function_name = aws_lambda_function.weather_bot_lambda.function_name
   principal     = "events.amazonaws.com"
   source_arn    = aws_cloudwatch_event_rule.every_day_at_5_am_utc.arn
 }
