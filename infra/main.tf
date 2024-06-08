@@ -64,3 +64,23 @@ resource "aws_iam_role" "example" {
 }
 EOF
 }
+
+resource "aws_cloudwatch_event_rule" "every_day_at_5_am_utc" {
+  name                = "every-day-at-5-am-utc"
+  description         = "Fires every day at 5 AM UTC"
+  schedule_expression = "cron(0 5 * * ? *)"
+}
+
+resource "aws_cloudwatch_event_target" "send_weather_update" {
+  rule      = aws_cloudwatch_event_rule.every_day_at_5_am_utc.name
+  target_id = "sendWeatherUpdate"
+  arn       = aws_lambda_function.example.arn
+}
+
+resource "aws_lambda_permission" "allow_cloudwatch" {
+  statement_id  = "AllowExecutionFromCloudWatch"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.example.function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.every_day_at_5_am_utc.arn
+}
