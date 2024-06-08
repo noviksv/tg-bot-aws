@@ -4,3 +4,5 @@ terraform.tfstate*
 infra/python-bot-layer/*
 infra/.tfvars
 infra/outfile.txt
+.venv
+.env
