@@ -1,0 +1,11 @@
+{
+  "image": "mcr.microsoft.com/vscode/devcontainers/base:ubuntu-20.04",
+  "remoteEnv": {
+    "AWS_ACCESS_KEY_ID": "${localEnv:AWS_ACCESS_KEY_ID}",
+    "AWS_SECRET_ACCESS_KEY": "${localEnv:AWS_SECRET_ACCESS_KEY}",
+    "BOT_TOKEN": "${localEnv:BOT_TOKEN}",
+    "BOT_CHAT_ID": "${localEnv:BOT_CHAT_ID}",
+    "WEATHER_API_TOKEN": "${localEnv:WEATHER_API_TOKEN}",
+  },
+  "postCreateCommand": "curl 'https://d1vvhvl2y92vvt.cloudfront.net/awscli-exe-linux-x86_64.zip' -o 'awscliv2.zip' && unzip awscliv2.zip && sudo ./aws/install"
+}
