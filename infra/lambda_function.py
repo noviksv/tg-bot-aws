@@ -54,3 +54,9 @@ def lambda_handler(event, context):
         #'body': json.dumps('Hello from Lambda!')
         'body': current_weather_json
     }
+
+#fix for local testing
+if __name__ == "__main__":
+    event = {}
+    context = {}
+    lambda_handler(event, context)
