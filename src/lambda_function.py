@@ -30,8 +30,11 @@ def get_current_weather():
     WEATHER_API_TOKEN = os.environ.get('WEATHER_API_TOKEN')
     send_text = 'http://api.openweathermap.org/data/2.5/weather?lat=52.26131518259818&lon=20.95682398281323&appid=' + WEATHER_API_TOKEN + \
                 '&units=metric'
-    response = requests.get(send_text)
-    current_temperature = response.json()['main']   
+    try:
+        response = requests.get(send_text)
+        current_temperature = response.json()['main']
+    except:
+        current_temperature = "Unknown"
     
     return response.json()
 
@@ -42,7 +45,10 @@ def lambda_handler(event, context):
     cur_tm = current_time()
     current_weather_json = get_current_weather()
     #formatting the message to be sent to the bot
-    current_weather = f"{get_weather_emoticon(current_weather_json['weather'][0]['main'])} {current_weather_json['weather'][0]['main']} {current_weather_json['main']['temp']}°C"
+    try:
+        current_weather = f"{get_weather_emoticon(current_weather_json['weather'][0]['main'])} {current_weather_json['weather'][0]['main']} {current_weather_json['main']['temp']}°C"
+    except:
+        current_weather = "Unknown"
 
     bot_message = f"Current weather is {current_weather}"
     send_text = 'https://api.telegram.org/bot' + BOT_TOKEN + '/sendMessage?chat_id=' + BOT_CHAT_ID + \

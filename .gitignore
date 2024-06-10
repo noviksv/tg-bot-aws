@@ -6,3 +6,4 @@ infra/.tfvars
 infra/outfile.txt
 .venv
 .env
+*.pyc
