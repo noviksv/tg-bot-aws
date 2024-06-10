@@ -18,3 +18,8 @@ Trigger lambda from local environment
 ```
  aws lambda invoke --function-name weather_bot outfile.txt
 ```
+
+Run some tests
+```
+cd src ;python -m unittest 
+```

@@ -14,7 +14,7 @@ class TestLambdaHandler(unittest.TestCase):
         event = {}
         context = {}
         response = lambda_handler(event, context)
-        self.assertEqual(response['statusCode'], 400)
+        self.assertEqual(response['statusCode'], 200)
         self.assertEqual(response['body'], {
             'weather': [{'main': 'Clear'}],
             'main': {'temp': 25}
