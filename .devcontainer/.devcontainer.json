@@ -6,6 +6,9 @@
     "BOT_TOKEN": "${localEnv:BOT_TOKEN}",
     "BOT_CHAT_ID": "${localEnv:BOT_CHAT_ID}",
     "WEATHER_API_TOKEN": "${localEnv:WEATHER_API_TOKEN}",
+    "TF_VAR_bot_token": "${localEnv:BOT_TOKEN}",
+    "TF_VAR_bot_chat_id": "${localEnv:BOT_CHAT_ID}",
+    "TF_VAR_weather_api_token": "${localEnv:WEATHER_API_TOKEN}"
   },
   "postCreateCommand": "curl 'https://d1vvhvl2y92vvt.cloudfront.net/awscli-exe-linux-x86_64.zip' -o 'awscliv2.zip' && unzip awscliv2.zip && sudo ./aws/install"
 }
