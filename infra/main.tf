@@ -20,7 +20,7 @@ variable "weather_api_token" {
 
 data "archive_file" "lambda_zip" {
   type        = "zip"
-  source_file = "lambda_function.py" # your Python lambda function file
+  source_file = "../src/lambda_function.py" # your Python lambda function file
   output_path = "lambda_function_payload.zip"
 }
 
