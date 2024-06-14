@@ -9,6 +9,11 @@ zip -r python-bot-layer.zip .
 
 aws lambda publish-layer-version --layer-name python-bot-layer --zip-file fileb://python-bot-layer.zip --compatible-runtimes python3.12
 ```
+## Infrastructure
+Initialize backend
+```
+terraform init -backend-config=.terraform.backend.hcl
+```
 Apply terraform infra
 ```
 terraform apply -var-file=".tfvars"
