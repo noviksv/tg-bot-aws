@@ -84,3 +84,30 @@ resource "aws_lambda_permission" "allow_cloudwatch" {
   principal     = "events.amazonaws.com"
   source_arn    = aws_cloudwatch_event_rule.every_day_at_5_am_utc.arn
 }
+
+
+resource "aws_iam_policy" "lambda_logs_policy" {
+  name        = "lambda_logs_policy"
+  description = "Policy for Lambda to create and add logs"
+  policy      = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents"
+      ],
+      "Resource": "arn:aws:logs:*:*:*"
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_logs_policy_attachment" {
+  role       = aws_iam_role.weather_bot_lambda.name
+  policy_arn = aws_iam_policy.lambda_logs_policy.arn
+}
