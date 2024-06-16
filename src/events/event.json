@@ -1,0 +1,28 @@
+{
+    "update_id": 863501259,
+    "message": {
+        "message_id": 328,
+        "from": {
+            "id": 790022784,
+            "is_bot": "False",
+            "first_name": "...",
+            "username": "...",
+            "language_code": "ru"
+        },
+        "chat": {
+            "id": 790022784,
+            "first_name": "...",
+            "username": "...",
+            "type": "private"
+        },
+        "date": 1718538369,
+        "text": "/weather5",
+        "entities": [
+            {
+                "offset": 0,
+                "length": 8, 
+                "type": "bot_command"
+            }
+        ]
+    }
+}
