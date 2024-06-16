@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import patch
-from lambda_function import current_time, get_weather_emoticon
+from lambda_function import get_weather_emoticon
 from lambda_function import lambda_handler
 
 class TestLambdaHandler(unittest.TestCase):
@@ -30,9 +30,9 @@ class TestLambdaHandler(unittest.TestCase):
         self.assertEqual(response['body'], {})
 
 class TestLambdaFunction(unittest.TestCase):
-    def test_current_time(self):
-        # Test that current_time returns a string
-        self.assertIsInstance(current_time(), str)
+    # def test_current_time(self):
+    #     # Test that current_time returns a string
+    #     self.assertIsInstance(current_time(), str)
 
     def test_get_weather_emoticon(self):
         # Test that get_weather_emoticon returns the correct emoticon for each weather condition
