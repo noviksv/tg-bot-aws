@@ -12,5 +12,20 @@
      "TF_VAR_bot_chat_id": "${localEnv:BOT_CHAT_ID}",
      "TF_VAR_weather_api_token": "${WEATHER_API_TOKEN}"
   },
-  "postCreateCommand": "curl 'https://d1vvhvl2y92vvt.cloudfront.net/awscli-exe-linux-x86_64.zip' -o 'awscliv2.zip' && unzip awscliv2.zip && sudo ./aws/install"
+  "postCreateCommand": "curl 'https://d1vvhvl2y92vvt.cloudfront.net/awscli-exe-linux-x86_64.zip' -o 'awscliv2.zip' && unzip awscliv2.zip && sudo ./aws/install",
+  "customizations": {
+    "vscode": {
+        // Set *default* container specific settings.json values on container create.
+        "settings": {
+            "editor.formatOnPaste": false, // required
+            "editor.formatOnType": false, // required
+            "editor.formatOnSave": true, // optional
+            "editor.formatOnSaveMode": "file", // required to format on save
+            "files.autoSave": "off" // optional but recommended
+        },
+        // Add the IDs of extensions you want installed when the container is created.
+        "extensions": [
+            "4ops.terraform",
+            "hashicorp.terraform"
+        ]
 }
