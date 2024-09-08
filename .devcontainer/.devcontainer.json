@@ -1,5 +1,9 @@
 {
-  "image": "mcr.microsoft.com/vscode/devcontainers/base:ubuntu-20.04",
+  "image": "mcr.microsoft.com/devcontainers/universal:2",
+  "features": {
+		"ghcr.io/devcontainers/features/terraform:1": {},
+    "ghcr.io/devcontainers/features/aws-cli:1": {}
+	},
   "remoteEnv": {
     //TODO: Investigate how variables are passed to devenev
     // looks like they are mapping automatically secret->env-var
@@ -12,7 +16,7 @@
      "TF_VAR_bot_chat_id": "${localEnv:BOT_CHAT_ID}",
      "TF_VAR_weather_api_token": "${WEATHER_API_TOKEN}"
   },
-  "postCreateCommand": "curl 'https://d1vvhvl2y92vvt.cloudfront.net/awscli-exe-linux-x86_64.zip' -o 'awscliv2.zip' && unzip awscliv2.zip && sudo ./aws/install",
+//  "postCreateCommand": "curl 'https://d1vvhvl2y92vvt.cloudfront.net/awscli-exe-linux-x86_64.zip' -o 'awscliv2.zip' && unzip awscliv2.zip && sudo ./aws/install",
   "customizations": {
     "vscode": {
         // Set *default* container specific settings.json values on container create.
