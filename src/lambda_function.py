@@ -29,7 +29,9 @@ def send_tg_msg(bot_message):
     send_text = 'https://api.telegram.org/bot' + BOT_TOKEN + '/sendMessage?chat_id=' + BOT_CHAT_ID + \
                     '&parse_mode=HTML&text=' + bot_message
     response = requests.get(send_text)
+    print("message was sent")
     response.raise_for_status()
+    return response.json()
 
 
 def get_current_weather():
@@ -50,11 +52,17 @@ def get_forecast_weather():
     return response.json()
 
 def lambda_handler(event, context):
-    print(event)
-    print(context)
+    print(f"event = {event}")
+    print(f"context = {context}")
+    # Check if the body is a string and needs parsing
+    event_body = event.get("body")
+    
+    # If the body is already a dictionary, skip parsing
+    if isinstance(event_body, str):
+        event_body = json.loads(event_body)
 
 
-    if event.get('message').get('text') == '/weather5':
+    if event_body.get('message') and event_body.get('message').get('text') == '/weather5':
         weather_json = get_forecast_weather()
         #formatting the message to be sent to the bot
         try:
@@ -75,11 +83,21 @@ def lambda_handler(event, context):
     
     send_tg_msg(bot_message=bot_message )
         
+    # return {
+    #     'statusCode': 200,
+    #     #'body': json.dumps('Hello from Lambda!')
+    #     'body': weather_json
+    # }
     return {
         'statusCode': 200,
-        #'body': json.dumps('Hello from Lambda!')
-        'body': weather_json
+        'headers': {
+            'Content-Type': 'application/json'
+        },
+        'body': json.dumps(weather_json
+        ),
+        'isBase64Encoded': False
     }
+
 
 
 
