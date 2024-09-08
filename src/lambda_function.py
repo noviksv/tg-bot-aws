@@ -61,6 +61,8 @@ def lambda_handler(event, context):
     if isinstance(event_body, str):
         event_body = json.loads(event_body)
 
+    weather_json = {}
+
 
     if event_body.get('message') and event_body.get('message').get('text') == '/weather5':
         weather_json = get_forecast_weather()
@@ -71,17 +73,20 @@ def lambda_handler(event, context):
             weather = "Unknown"
         bot_message = f"Forecast weather is {weather}"
 
-    else:
+    elif event_body.get('message') and event_body.get('message').get('text') == '/weather':
         weather_json = get_current_weather()
         #formatting the message to be sent to the bot
         try:
             weather = f"{get_weather_emoticon(weather_json['weather'][0]['main'])} {weather_json['weather'][0]['main']} {weather_json['main']['temp']}°C"
         except:
             weather = "Unknown"
-
         bot_message = f"Current weather is {weather}"
     
-    send_tg_msg(bot_message=bot_message )
+    else: 
+        bot_message = f"Unknown command"
+
+    
+    send_tg_msg(bot_message=bot_message)
         
     # return {
     #     'statusCode': 200,
