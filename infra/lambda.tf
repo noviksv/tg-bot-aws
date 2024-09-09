@@ -1,17 +1,17 @@
 resource "aws_lambda_function" "weather_bot_lambda" {
   function_name = "weather_bot"
 
-  filename      = data.archive_file.lambda_zip.output_path
+  filename         = data.archive_file.lambda_zip.output_path
   source_code_hash = data.archive_file.lambda_zip.output_base64sha256
 
   handler = "lambda_function.lambda_handler" # replace with the path to your Lambda function handler
-  runtime = "python3.12"    # replace with your Lambda function's runtime
-  layers = ["arn:aws:lambda:eu-north-1:437823987706:layer:python-bot-layer:1"]
+  runtime = "python3.12"                     # replace with your Lambda function's runtime
+  layers  = ["arn:aws:lambda:eu-north-1:437823987706:layer:python-bot-layer:1"]
 
   environment {
     variables = {
-      BOT_TOKEN   = var.bot_token
-      BOT_CHAT_ID = var.bot_chat_id
+      BOT_TOKEN         = var.bot_token
+      BOT_CHAT_ID       = var.bot_chat_id
       WEATHER_API_TOKEN = var.weather_api_token
     }
   }
@@ -37,18 +37,6 @@ resource "aws_iam_role" "weather_bot_lambda" {
   ]
 }
 EOF
-}
-
-resource "aws_cloudwatch_event_rule" "every_day_at_5_am_utc" {
-  name                = "every-day-at-5-am-utc"
-  description         = "Fires every day at 5 AM UTC"
-  schedule_expression = "cron(0 5 * * ? *)"
-}
-
-resource "aws_cloudwatch_event_target" "send_weather_update" {
-  rule      = aws_cloudwatch_event_rule.every_day_at_5_am_utc.name
-  target_id = "sendWeatherUpdate"
-  arn       = aws_lambda_function.weather_bot_lambda.arn
 }
 
 resource "aws_lambda_permission" "allow_cloudwatch" {
@@ -89,7 +77,7 @@ resource "aws_iam_role_policy_attachment" "lambda_logs_policy_attachment" {
 resource "aws_lambda_permission" "apigw" {
   statement_id  = "AllowAPIGatewayInvoke"
   action        = "lambda:InvokeFunction"
-  function_name = "${aws_lambda_function.weather_bot_lambda.function_name}"
+  function_name = aws_lambda_function.weather_bot_lambda.function_name
   principal     = "apigateway.amazonaws.com"
 
   # The /*/* portion grants access from any method on any resource
