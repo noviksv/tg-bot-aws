@@ -5,7 +5,22 @@ from datetime import datetime
 
 WEATHER_API_TOKEN = os.environ.get('WEATHER_API_TOKEN')
 BOT_TOKEN = os.environ.get('BOT_TOKEN')
-BOT_CHAT_ID = os.environ.get('BOT_CHAT_ID')
+#BOT_CHAT_ID = os.environ.get('BOT_CHAT_ID')
+
+
+def extract_chat_id(payload):
+    try:
+        # Parse the payload JSON
+        event = json.loads(payload)
+        
+        # Extract the chat ID from the parsed event
+        chat_id = event['message']['chat']['id']
+        
+        return chat_id
+    except (KeyError, json.JSONDecodeError) as e:
+        # Handle potential errors
+        print(f"Error extracting chat ID: {e}")
+        return None
 
 
 def get_weather_emoticon(weather):
@@ -25,8 +40,8 @@ def get_weather_emoticon(weather):
         return "🤷"
     
 
-def send_tg_msg(bot_message):
-    send_text = 'https://api.telegram.org/bot' + BOT_TOKEN + '/sendMessage?chat_id=' + BOT_CHAT_ID + \
+def send_tg_msg(bot_message, chat_id):
+    send_text = 'https://api.telegram.org/bot' + BOT_TOKEN + '/sendMessage?chat_id=' + str(chat_id) + \
                     '&parse_mode=HTML&text=' + bot_message
     response = requests.get(send_text)
     print("message was sent")
@@ -61,6 +76,15 @@ def lambda_handler(event, context):
     if isinstance(event_body, str):
         event_body = json.loads(event_body)
 
+    # Instead of os.environ.get('BOT_CHAT_ID'), use:
+    chat_id = extract_chat_id(json.dumps(event_body))
+    
+    if chat_id is None:
+        return {
+            'statusCode': 400,
+            'body': json.dumps('Failed to extract chat ID from the event')
+        }
+    
     weather_json = {}
 
 
@@ -86,7 +110,7 @@ def lambda_handler(event, context):
         bot_message = f"Unknown command"
 
     
-    send_tg_msg(bot_message=bot_message)
+    send_tg_msg(bot_message=bot_message, chat_id=chat_id)
         
     # return {
     #     'statusCode': 200,

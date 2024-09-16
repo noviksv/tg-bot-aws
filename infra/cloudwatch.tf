@@ -9,8 +9,14 @@ resource "aws_cloudwatch_event_rule" "every_day_at_5_am_utc" {
 locals {
   event_payload = jsonencode({
     "body" = {
-      "message" = {"text" = "/weather5"
-            }}})
+      "message" = {
+        "text" = "/weather5"
+        "chat" = {
+          "id" = var.bot_chat_id
+        }
+      }
+    }
+  })
 }
 
 resource "aws_cloudwatch_event_target" "send_weather_update" {

@@ -12,7 +12,7 @@ class TestLambdaHandler(unittest.TestCase):
             'weather': [{'main': 'Clear'}],
             'main': {'temp': 25}
         }
-        event = {'body': {'message': {'text': '/weather5'}}}
+        event = {'body': {'message': {'text': '/weather5',"chat": {"id":123}}}}
         context = {}
         response = lambda_handler(event, context)
         self.assertEqual(response['statusCode'], 200)
@@ -24,7 +24,7 @@ class TestLambdaHandler(unittest.TestCase):
     @patch('lambda_function.requests.get')
     def test_lambda_handler_failure(self, mock_get):
         mock_get.return_value.json.return_value = {}
-        event = {'body': {'message': {'text': '/weather5'}}}
+        event = {'body': {'message': {'text': '/weather5',"chat": {"id":123}}}}
         context = {}
         response = lambda_handler(event, context)
         self.assertEqual(response['statusCode'], 200)

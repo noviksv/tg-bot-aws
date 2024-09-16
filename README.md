@@ -21,7 +21,7 @@ terraform apply -var-file=".tfvars"
 Trigger lambda from local environment
 
 ```
- aws lambda invoke --function-name weather_bot outfile.txt
+aws lambda invoke --function-name weather_bot --payload file://events/event.json --cli-binary-format raw-in-base64-out outfile.txt
 ```
 
 Run some tests
