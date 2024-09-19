@@ -53,6 +53,11 @@ jobs:
         -no-color
     
 
-    # - name: Terraform Apply
-    #   if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    #   run: terraform apply -auto-approve -var-file=".tfvars"
+    - name: Terraform Apply
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      run: |
+        terraform apply \
+        -var="bot_chat_id=${{ secrets.TF_VAR_BOT_CHAT_ID }}" \
+        -var="bot_token=${{ secrets.TF_VAR_BOT_TOKEN }}" \
+        -var="weather_api_token=${{ secrets.TF_VAR_WEATHER_API_TOKEN }}" \
+        -auto-approve \
