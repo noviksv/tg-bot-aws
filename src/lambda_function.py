@@ -1,11 +1,20 @@
 import json
 import os
-import requests
+from decimal import Decimal
 from datetime import datetime
+import requests
+import boto3
+
+
 
 WEATHER_API_TOKEN = os.environ.get('WEATHER_API_TOKEN')
 BOT_TOKEN = os.environ.get('BOT_TOKEN')
 #BOT_CHAT_ID = os.environ.get('BOT_CHAT_ID')
+
+
+# Initialize DynamoDB client
+dynamodb = boto3.resource('dynamodb')
+table = dynamodb.Table('weather_bot_settings')
 
 
 def extract_chat_id(payload):
@@ -60,11 +69,62 @@ def get_current_weather():
     
     return response.json()
 
-def get_forecast_weather():
-    send_text = 'http://api.openweathermap.org/data/2.5/forecast?lat=52.26131518259818&lon=20.95682398281323&appid=' + WEATHER_API_TOKEN + \
-                '&units=metric'
-    response = requests.get(send_text)
-    return response.json()
+def get_forecast_weather(lat, lon):
+    base_url = "http://api.openweathermap.org/data/2.5/forecast"
+    params = {
+        'units': 'metric',
+        'appid': WEATHER_API_TOKEN,
+        'lat': lat,
+        'lon': lon
+    }
+    response = requests.get(base_url, params=params)
+    if response.status_code == 200 and response.json():
+        return response.json()
+    return None
+
+def get_city_coordinates(city_name):
+    base_url = "http://api.openweathermap.org/geo/1.0/direct"
+    params = {
+        'q': city_name,
+        'limit': 1,
+        'appid': WEATHER_API_TOKEN
+    }
+    response = requests.get(base_url, params=params)
+    if response.status_code == 200 and response.json():
+        location = response.json()[0]
+        return location['lat'], location['lon']
+    return None, None
+
+
+def get_user_city(chat_id):
+    try:
+        response = table.get_item(Key={'chat_id': str(chat_id)})
+        if 'Item' in response:
+            return response['Item']
+    except Exception as e:
+        print(f"Error getting user city: {e}")
+    return None
+
+
+
+def set_user_city(chat_id, city):
+    lat, lon = get_city_coordinates(city)
+    if lat and lon:
+        try:
+            table.put_item(
+                Item={
+                    'chat_id': str(chat_id),  # Ensure chat_id is a string
+                    'city': city,
+                    'lat': Decimal(str(lat)),  # Convert to Decimal for DynamoDB
+                    'lon': Decimal(str(lon))  # Convert to Decimal for DynamoDB
+                }
+            )
+            return True
+        except Exception as e:
+            print(f"Error setting user city: {e}")
+            return False
+    return False
+
 
 def lambda_handler(event, context):
     print(f"event = {event}")
@@ -78,6 +138,7 @@ def lambda_handler(event, context):
 
     # Instead of os.environ.get('BOT_CHAT_ID'), use:
     chat_id = extract_chat_id(json.dumps(event_body))
+    print(f"Extracted chat_id: {chat_id}, Type: {type(chat_id)}")
     
     if chat_id is None:
         return {
@@ -87,36 +148,50 @@ def lambda_handler(event, context):
     
     weather_json = {}
 
-
-    if event_body.get('message') and event_body.get('message').get('text') == '/weather5':
-        weather_json = get_forecast_weather()
-        #formatting the message to be sent to the bot
-        try:
-            weather = f"{get_weather_emoticon(weather_json['list'][0]['weather'][0]['main'])} {weather_json['list'][0]['weather'][0]['main']} {weather_json['list'][0]['main']['temp']}°C"
-        except:
-            weather = "Unknown"
-        bot_message = f"Forecast weather is {weather}"
-
-    elif event_body.get('message') and event_body.get('message').get('text') == '/weather':
-        weather_json = get_current_weather()
-        #formatting the message to be sent to the bot
-        try:
-            weather = f"{get_weather_emoticon(weather_json['weather'][0]['main'])} {weather_json['weather'][0]['main']} {weather_json['main']['temp']}°C"
-        except:
-            weather = "Unknown"
-        bot_message = f"Current weather is {weather}"
+    message_text = event_body.get('message', {}).get('text', '').strip()
     
-    else: 
-        bot_message = f"Unknown command"
-
+    if message_text.startswith('/setcity'):
+        city = message_text.replace('/setcity', '').strip()
+        if set_user_city(chat_id, city):
+            bot_message = f"City set to {city}"
+        else:
+            bot_message = "Failed to set city. Please try again with a valid city name."
     
+    elif message_text in ['/weather', '/weather5']:
+        user_city = get_user_city(chat_id)
+        if not user_city:
+            bot_message = "Please set your city first using /setcity command"
+        else:
+            lat, lon = user_city['lat'], user_city['lon']
+            if message_text == '/weather':
+                weather_json = get_current_weather(lat, lon)
+                if weather_json:
+                    weather = f"{get_weather_emoticon(weather_json['weather'][0]['main'])} {weather_json['weather'][0]['main']} {weather_json['main']['temp']}°C"
+                    bot_message = f"Current weather in {user_city['city']} is {weather}"
+                else:
+                    bot_message = "Failed to fetch weather data"
+            else:  # /weather5
+                weather_json = get_forecast_weather(lat, lon)
+                if weather_json:
+                    weather = f"{get_weather_emoticon(weather_json['list'][0]['weather'][0]['main'])} {weather_json['list'][0]['weather'][0]['main']} {weather_json['list'][0]['main']['temp']}°C"
+                    bot_message = f"Forecast weather in {user_city['city']} is {weather}"
+                else:
+                    bot_message = "Failed to fetch forecast data"
+    
+    else:
+        bot_message = "Unknown command. Available commands: /setcity [city name], /weather, /weather5"
+
     send_tg_msg(bot_message=bot_message, chat_id=chat_id)
+
+    set_user_city(chat_id, 'Warsaw')
         
     # return {
     #     'statusCode': 200,
     #     #'body': json.dumps('Hello from Lambda!')
     #     'body': weather_json
     # }
+    #print(get_city_coordinates('London'))
+
     return {
         'statusCode': 200,
         'headers': {
@@ -126,8 +201,6 @@ def lambda_handler(event, context):
         ),
         'isBase64Encoded': False
     }
-
-
 
 
 
