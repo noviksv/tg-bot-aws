@@ -85,3 +85,33 @@ resource "aws_lambda_permission" "apigw" {
   source_arn = "${aws_api_gateway_rest_api.example.execution_arn}/*/*"
 }
 
+# Policy for DynamoDB access
+resource "aws_iam_policy" "dynamodb_access_policy" {
+  name        = "weather_bot_dynamodb_access_policy"
+  path        = "/"
+  description = "IAM policy for DynamoDB access from Lambda"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "dynamodb:GetItem",
+          "dynamodb:PutItem",
+          "dynamodb:UpdateItem",
+          "dynamodb:DeleteItem",
+          "dynamodb:Query",
+          "dynamodb:Scan"
+        ]
+        Resource = aws_dynamodb_table.weather_bot_settings.arn
+      }
+    ]
+  })
+}
+
+# Attach the DynamoDB policy to the Lambda execution role
+resource "aws_iam_role_policy_attachment" "lambda_dynamodb" {
+  role       = aws_iam_role.weather_bot_lambda.name
+  policy_arn = aws_iam_policy.dynamodb_access_policy.arn
+}
