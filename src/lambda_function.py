@@ -133,7 +133,6 @@ def set_user_city(chat_id, city):
             return False
     return False
 
-
 def lambda_handler(event, context):
     print(f"event = {event}")
     print(f"context = {context}")
@@ -191,7 +190,7 @@ def lambda_handler(event, context):
 
     send_tg_msg(bot_message=bot_message, chat_id=chat_id)
 
-    set_user_city(chat_id, 'Warsaw')
+    #set_user_city(chat_id, 'Warsaw')
         
     # return {
     #     'statusCode': 200,
