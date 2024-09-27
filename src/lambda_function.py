@@ -58,16 +58,24 @@ def send_tg_msg(bot_message, chat_id):
     return response.json()
 
 
-def get_current_weather():
-    send_text = 'http://api.openweathermap.org/data/2.5/weather?lat=52.26131518259818&lon=20.95682398281323&appid=' + WEATHER_API_TOKEN + \
-                '&units=metric'
-    try:
-        response = requests.get(send_text)
-        current_temperature = response.json()['main']
-    except:
-        current_temperature = "Unknown"
-    
-    return response.json()
+def get_current_weather(lat, lon):
+    base_url = "http://api.openweathermap.org/data/2.5/weather"
+    params = {
+        'units': 'metric',
+        'appid': WEATHER_API_TOKEN,
+        'lat': lat,
+        'lon': lon
+    }
+    response = requests.get(base_url, params=params)
+    if response.status_code == 200 and response.json()['main']:
+        return response.json()
+    return None
+    # try:
+    #     response = requests.get(base_url, params=params)
+    #     current_temperature = response.json()['main']
+    # except:
+    #     current_temperature = "Unknown"
+
 
 def get_forecast_weather(lat, lon):
     base_url = "http://api.openweathermap.org/data/2.5/forecast"
