@@ -1,3 +1,7 @@
+## Project Description
+
+This project is implementation telegram bot on aws serverless stack. 
+
 ## C4 Diagrams
 
 ### System Context
