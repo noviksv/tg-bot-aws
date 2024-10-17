@@ -1,3 +1,12 @@
+## C4 Diagrams
+
+### System Context
+
+![alt](docs/tg-bot-system_context.png)
+
+### Container Diagram
+![alt](docs/tg-bot-container_diagram.png)
+
 # tg-bot-aws
 
 Create lambda layer and publish it
