@@ -1,6 +1,15 @@
 ## Project Description
 
-This project is implementation telegram bot on aws serverless stack. 
+This project is implementation telegram bot on aws serverless stack.
+
+## AWS Technologies Used
+
+- **AWS Lambda**: For running the serverless functions.
+- **Amazon API Gateway**: To expose the Lambda functions as HTTP endpoints.
+- **Amazon DynamoDB**: For storing user settings and data.
+- **Amazon CloudWatch**: For scheduling events and monitoring.
+- **AWS IAM**: For managing access and permissions.
+- **Amazon S3**: For storing Terraform state files.
 
 ## C4 Diagrams
 
@@ -48,3 +57,18 @@ Set webhook to telegram bot
 ```
 curl https://api.telegram.org/bot{my_bot_token}/setWebhook?url={url_to_send_updates_to}
 ```
+
+
+## CI/CD Pipelines
+
+### Terraform CI/CD Pipeline
+
+The CI/CD pipeline for Terraform is defined in [`.github/workflows/pipeline.yml`](.github/workflows/pipeline.yml). It includes the following steps:
+
+1. **Checkout**: Checks out the repository code.
+2. **Setup Terraform**: Sets up Terraform with the specified version.
+3. **Configure AWS Credentials**: Configures AWS credentials using secrets stored in GitHub.
+4. **Terraform Init**: Initializes Terraform with backend configuration.
+5. **Terraform Format**: Checks the formatting of Terraform files.
+6. **Terraform Plan**: Creates an execution plan for Terraform.
+7. **Terraform Apply**: Applies the Terraform plan if the branch is `main` and the event is a push.
